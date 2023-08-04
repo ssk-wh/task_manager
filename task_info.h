@@ -5,7 +5,7 @@
 #include <QDBusMetaType>
 
 enum TaskType {
-    Unknown,
+    Unknown = 0,
     Bash,
     Lua,
     Python,

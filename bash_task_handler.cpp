@@ -2,7 +2,6 @@
 
 #include <QDebug>
 #include <QLoggingCategory>
-
 #include <QThread>
 #include <QProcess>
 

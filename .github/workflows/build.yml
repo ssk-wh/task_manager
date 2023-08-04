@@ -1,0 +1,37 @@
+name: Build, Package, and Upload
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+            sudo apt update
+            sudo apt build-dep .
+
+      - name: Build
+        run: |
+            sudo apt-get install dpkg-dev
+            dpkg-buildpackage -us -uc -nc -j$(nproc)
+
+      - name: Set envs
+        run: |
+            echo "WORKSPACE_PARENT_DIR=$(dirname "$GITHUB_WORKSPACE")" >> $GITHUB_ENV
+            echo "DEB_VERSION=$(dpkg-parsechangelog --show-field Version)" >> $GITHUB_ENV
+            echo "DEB_ARCH=$(dpkg --print-architecture)" >> $GITHUB_ENV
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: task-manager_${{ env.DEB_VERSION }}_${{ env.DEB_ARCH }}
+          path: ${{ env.WORKSPACE_PARENT_DIR }}/*.deb
+          compression-level: 0

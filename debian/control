@@ -1,0 +1,22 @@
+Source: task-manager
+Section: utils
+Priority: optional
+Maintainer: ssk-wh <jushengshi@gmail.com>
+Build-Depends:
+ debhelper (>= 10),
+ debhelper-compat (= 10),
+ cmake,
+ qt5-qmake,
+ libgsettings-qt-dev,
+ qtbase5-dev,
+ libgtest-dev,
+Standards-Version: 4.5.0
+Homepage: https://github.com/ssk-wh/task-manager
+Vcs-Browser: no
+Vcs-Git: no
+Rules-Requires-Root: no
+
+Package: task-manager
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: a simple task manager

@@ -10,14 +10,17 @@
 class BashTaskHandler : public AbstractTaskHandler
 {
     Q_OBJECT
+
 public:
-    explicit BashTaskHandler(const TaskInfo &info, QObject *parent = nullptr);
+    explicit BashTaskHandler(const Task &info, QObject *parent = nullptr);
 
 protected:
-    virtual void run();
+    void run() Q_DECL_OVERRIDE;
 
 private:
-    TaskInfo m_info;
+    Task m_info;
 };
+
+DECLARE_CREATE(BashTaskHandler);
 
 #endif // BASH_TASK_HANDLER_H

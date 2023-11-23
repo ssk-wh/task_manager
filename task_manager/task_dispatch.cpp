@@ -42,7 +42,6 @@ void TaskDispatcher::dispatch(const Task &info)
             m_dispatchTaskMap.remove(handler);
             Q_EMIT handlerCountChanged(m_dispatchTaskMap.size());
         });
-
     } else {
         Q_EMIT taskStatusChanged(info.id, TaskStatus::Ready);
         qCWarning(taskdispatcher) << "Unimplement task type:" << static_cast<int>(info.type)

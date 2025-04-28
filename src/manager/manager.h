@@ -9,22 +9,22 @@
 
 #include "abstract_task_handler.h"
 
-class TaskDispatcher;
-class TaskCache;
-class TaskReporter;
+class Dispatcher;
+class Cache;
+class Reporter;
 class QTimer;
 /**
- * @brief The TaskManager class
+ * @brief The Manager class
  * The manager of tasks. It receives tasks remotely, delegates them to the dispatcher, caches task status via the cache, and notifies the remote side of execution results after completion.
  */
-class TaskManager : public QObject, public QDBusContext
+class Manager : public QObject, public QDBusContext
 {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "io.github.ssk.TaskManager")
+    Q_CLASSINFO("D-Bus Interface", "io.github.ssk.Manager")
 
 public:
-    explicit TaskManager(QObject *parent = nullptr);
-    ~ TaskManager();
+    explicit Manager(QObject *parent = nullptr);
+    ~ Manager();
 
 Q_SIGNALS:
     void taskAboutToDispatch(const Task &task, const TaskStatus &status);
@@ -54,9 +54,9 @@ private:
     TaskStatus taskStatusFromServer(int taskId);
 
 private:
-    TaskDispatcher *m_displatcher;
-    TaskCache *m_taskCache;
-    QPointer<TaskReporter> m_taskReporter;
+    Dispatcher *m_displatcher;
+    Cache *m_taskCache;
+    QPointer<Reporter> m_taskReporter;
 
     // As long as there are completed tasks, periodically trigger task status upload
     QTimer *m_periodUploadTimer;

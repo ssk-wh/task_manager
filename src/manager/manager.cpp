@@ -12,10 +12,10 @@
 Q_LOGGING_CATEGORY(taskManager, "taskmanager")
 
 // When receiving a task from remote, the task id must be unique and not duplicated. This is a fundamental requirement.
-TaskManager::TaskManager(QObject *parent)
+Manager::Manager(QObject *parent)
     : QObject(parent)
-    , m_displatcher(new TaskDispatcher(this))
-    , m_taskCache(new TaskCache(this))
+    , m_displatcher(new Dispatcher(this))
+    , m_taskCache(new Cache(this))
     , m_periodUploadTimer(new QTimer(this))
 {
     registerMetaType();
@@ -28,7 +28,7 @@ TaskManager::TaskManager(QObject *parent)
     m_periodUploadTimer->setInterval(10 * 1000);
 }
 
-TaskManager::~TaskManager()
+Manager::~Manager()
 {
     auto pool = QThreadPool::globalInstance();
     if (pool->activeThreadCount() > 0) {
@@ -37,18 +37,18 @@ TaskManager::~TaskManager()
     }
 }
 
-void TaskManager::dispatchTask(int type, int id, const QString &name, const QString &command)
+void Manager::dispatchTask(int type, int id, const QString &name, const QString &command)
 {   
     Task info {static_cast<TaskType>(type), id, name, command};
     dispatchTask(info);
 }
 
 /**
- * @brief TaskManager::dispatchTask
+ * @brief Manager::dispatchTask
  * @param info Task information
  * @note  Tasks received from the server can be dispatched through this interface
  */
-void TaskManager::dispatchTask(const Task &info)
+void Manager::dispatchTask(const Task &info)
 {
     static QMap<TaskType, QString> map = {{TaskType::Unknown, "Unknown"}
                                           , {TaskType::Ping, "Ping"}
@@ -64,7 +64,7 @@ void TaskManager::dispatchTask(const Task &info)
     m_displatcher->dispatch(info);
 }
 
-void TaskManager::onTaskStatusChanged(int taskId, const TaskStatus &status)
+void Manager::onTaskStatusChanged(int taskId, const TaskStatus &status)
 {
     Q_EMIT taskStatusChanged(taskId, static_cast<int>(status));
 
@@ -79,7 +79,7 @@ void TaskManager::onTaskStatusChanged(int taskId, const TaskStatus &status)
     }
 }
 
-void TaskManager::onTaskHandleFinished(int taskId)
+void Manager::onTaskHandleFinished(int taskId)
 {
     Q_EMIT taskHandleFinished(taskId);
 
@@ -101,7 +101,7 @@ void TaskManager::onTaskHandleFinished(int taskId)
     }
 }
 
-void TaskManager::tryUploadResult()
+void Manager::tryUploadResult()
 {
     qCDebug(taskManager) << "Remaining check, handling task count:" << m_displatcher->handlerCount() << ", finished task count:" << m_finishedTaskMap.size();
 
@@ -112,13 +112,13 @@ void TaskManager::tryUploadResult()
 
     // If the previous thread's work is done and the object is deleted, create a new object to continue uploading other data
     if (m_taskReporter.isNull()) {
-        m_taskReporter = new TaskReporter(m_finishedTaskMap, this);
+        m_taskReporter = new Reporter(m_finishedTaskMap, this);
         m_taskReporter.data()->setAutoDelete(true);
 
-        connect(m_taskReporter.data(), &TaskReporter::uploadSuccess, this, &TaskManager::onUploadSuccess);
-        connect(m_taskReporter.data(), &TaskReporter::uploadFailed, this, &TaskManager::onUploadFailed);
-        connect(m_taskReporter.data(), &TaskReporter::uploadFinished, this, &TaskManager::onUploadFinished);
-        connect(m_taskReporter.data(), &TaskReporter::uploadSuccess, m_taskCache, &TaskCache::remove);
+        connect(m_taskReporter.data(), &Reporter::uploadSuccess, this, &Manager::onUploadSuccess);
+        connect(m_taskReporter.data(), &Reporter::uploadFailed, this, &Manager::onUploadFailed);
+        connect(m_taskReporter.data(), &Reporter::uploadFinished, this, &Manager::onUploadFinished);
+        connect(m_taskReporter.data(), &Reporter::uploadSuccess, m_taskCache, &Cache::remove);
 
         qCDebug(taskManager) << "Start upload task status, task count:" << m_finishedTaskMap.size();
 
@@ -126,7 +126,7 @@ void TaskManager::tryUploadResult()
     }
 }
 
-void TaskManager::onUploadSuccess(int taskId)
+void Manager::onUploadSuccess(int taskId)
 {
     qCDebug(taskManager).noquote() << QString("Upload status success, id: %1").arg(taskId);
     m_finishedTaskMap.remove(taskId);
@@ -136,35 +136,35 @@ void TaskManager::onUploadSuccess(int taskId)
     }
 }
 
-void TaskManager::onUploadFailed(int taskId)
+void Manager::onUploadFailed(int taskId)
 {
     qCDebug(taskManager).noquote() << QString("Failed to upload status, id: %1, will be retry after a while...").arg(taskId);
 }
 
-void TaskManager::onUploadFinished()
+void Manager::onUploadFinished()
 {
     qCDebug(taskManager) << "Current loop upload finished";
 }
 
-void TaskManager::registerMetaType()
+void Manager::registerMetaType()
 {
     qRegisterMetaType<TaskStatus>("TaskStatus");
     qRegisterMetaType<Task>("TaskInfo");
     qDBusRegisterMetaType<Task>();
 }
 
-void TaskManager::initConnection()
+void Manager::initConnection()
 {
-    connect(this, &TaskManager::taskAboutToDispatch, m_taskCache, &TaskCache::add);
+    connect(this, &Manager::taskAboutToDispatch, m_taskCache, &Cache::add);
     // Task status feedback | Real-time local status recording to prevent exceptions
-    connect(m_displatcher, &TaskDispatcher::taskStatusChanged, this, &TaskManager::onTaskStatusChanged);
-    connect(m_displatcher, &TaskDispatcher::taskStatusChanged, m_taskCache, &TaskCache::update);
-    connect(m_displatcher, &TaskDispatcher::taskHandleFinished, this, &TaskManager::onTaskHandleFinished);
+    connect(m_displatcher, &Dispatcher::taskStatusChanged, this, &Manager::onTaskStatusChanged);
+    connect(m_displatcher, &Dispatcher::taskStatusChanged, m_taskCache, &Cache::update);
+    connect(m_displatcher, &Dispatcher::taskHandleFinished, this, &Manager::onTaskHandleFinished);
 
-    connect(m_periodUploadTimer, &QTimer::timeout, this, &TaskManager::tryUploadResult);
+    connect(m_periodUploadTimer, &QTimer::timeout, this, &Manager::tryUploadResult);
 }
 
-void TaskManager::loadHistoryTask()
+void Manager::loadHistoryTask()
 {
     QMetaObject::invokeMethod(this, [ = ] {
         qCDebug(taskManager) << "Load history task start";
@@ -197,12 +197,12 @@ void TaskManager::loadHistoryTask()
 }
 
 /**
- * @brief TaskManager::taskStatusFromServer
+ * @brief Manager::taskStatusFromServer
  * @param taskId
  * @return The server should provide a query interface to obtain the execution status of the task.
  * @note  However, this is just a demo for validation purposes, so it is not implemented here.
  */
-TaskStatus TaskManager::taskStatusFromServer(int taskId)
+TaskStatus Manager::taskStatusFromServer(int taskId)
 {
     Q_UNUSED(taskId);
     // TODO

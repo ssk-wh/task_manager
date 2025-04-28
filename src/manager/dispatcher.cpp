@@ -10,7 +10,7 @@
 
 Q_LOGGING_CATEGORY(taskdispatcher, "dispatcher")
 
-TaskDispatcher::TaskDispatcher(QObject *parent)
+Dispatcher::Dispatcher(QObject *parent)
     : QObject(parent)
 {
     m_handlerMap.insert(TaskType::Ping,       reinterpret_cast<AbstractTaskHandler* (*)(const Task&, QObject*)>(&CREATE_PTR(PingTaskHandler)));
@@ -19,15 +19,15 @@ TaskDispatcher::TaskDispatcher(QObject *parent)
     m_handlerMap.insert(TaskType::Strategy,   reinterpret_cast<AbstractTaskHandler* (*)(const Task&, QObject*)>(&CREATE_PTR(StrategyTaskHandler)));
 }
 
-void TaskDispatcher::dispatch(const Task &info)
+void Dispatcher::dispatch(const Task &info)
 {
     TaskHandlerConstructor handlerConstructor = m_handlerMap.value(info.type, nullptr);
     if (handlerConstructor) {
         AbstractTaskHandler *handler = handlerConstructor(info, this);
         Q_ASSERT_X(handler, "Task dispatch error", "All handler classes must implement the 'create' entry function"
                                                    ", and you can use the DECLARE_CREATE macro for a quick implementation.");
-        connect(handler, &AbstractTaskHandler::taskStatusChanged, this, &TaskDispatcher::taskStatusChanged);
-        connect(handler, &AbstractTaskHandler::taskHandleFinished, this, &TaskDispatcher::taskHandleFinished);
+        connect(handler, &AbstractTaskHandler::taskStatusChanged, this, &Dispatcher::taskStatusChanged);
+        connect(handler, &AbstractTaskHandler::taskHandleFinished, this, &Dispatcher::taskHandleFinished);
 
         handler->setAutoDelete(true);
 
@@ -52,7 +52,7 @@ void TaskDispatcher::dispatch(const Task &info)
     }
 }
 
-int TaskDispatcher::handlerCount()
+int Dispatcher::handlerCount()
 {
     return m_dispatchTaskMap.size();
 }

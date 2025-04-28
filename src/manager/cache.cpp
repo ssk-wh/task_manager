@@ -13,7 +13,7 @@ Q_LOGGING_CATEGORY(taskCache, "taskcache")
 
 #define TASK_FILE(task_id) (m_configPath + QString("/%1").arg(task_id))
 
-TaskCache::TaskCache(QObject *parent)
+Cache::Cache(QObject *parent)
     : QObject(parent)
     , m_configPath(QStandardPaths::writableLocation(QStandardPaths::CacheLocation))
 {
@@ -23,7 +23,7 @@ TaskCache::TaskCache(QObject *parent)
     }
 }
 
-QMap<Task, TaskStatus> TaskCache::loadFromCache() const
+QMap<Task, TaskStatus> Cache::loadFromCache() const
 {
     QMap<Task, TaskStatus> historyTaskMap;
 
@@ -47,7 +47,7 @@ QMap<Task, TaskStatus> TaskCache::loadFromCache() const
     return historyTaskMap;
 }
 
-void TaskCache::add(const Task &info, const TaskStatus &status)
+void Cache::add(const Task &info, const TaskStatus &status)
 {
     qCDebug(taskCache) << "Add task info to cache, id:" << info.id;
 
@@ -68,7 +68,7 @@ void TaskCache::add(const Task &info, const TaskStatus &status)
 #endif
 }
 
-void TaskCache::update(int taskId, const TaskStatus &status)
+void Cache::update(int taskId, const TaskStatus &status)
 {
     static QMap<TaskStatus, QString> map = {{TaskStatus::Ready, "Ready"}
                                             , {TaskStatus::Failure, "Failure"}
@@ -109,7 +109,7 @@ void TaskCache::update(int taskId, const TaskStatus &status)
     }
 }
 
-void TaskCache::remove(int taskId)
+void Cache::remove(int taskId)
 {
     qCDebug(taskCache) << "Remove from cache, id:" << taskId;
 
@@ -130,7 +130,7 @@ void TaskCache::remove(int taskId)
     }
 }
 
-void TaskCache::writeJsonToFile(const QString &fileName, const QJsonObject &obj) const
+void Cache::writeJsonToFile(const QString &fileName, const QJsonObject &obj) const
 {
     QJsonDocument doc(obj);
     QByteArray taskContent = doc.toJson();
@@ -145,7 +145,7 @@ void TaskCache::writeJsonToFile(const QString &fileName, const QJsonObject &obj)
     file.close();
 }
 
-QJsonObject TaskCache::readJsonFromFile(const QString &fileName) const
+QJsonObject Cache::readJsonFromFile(const QString &fileName) const
 {
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly)) {

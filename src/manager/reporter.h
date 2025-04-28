@@ -1,5 +1,5 @@
-#ifndef TASK_REPORTER_H
-#define TASK_REPORTER_H
+#ifndef REPORTER_H
+#define REPORTER_H
 
 #include "task.h"
 
@@ -12,11 +12,11 @@
  * This class is used to upload task execution status in a separate thread.
  */
 
-class TaskReporter : public QObject, public QRunnable
+class Reporter : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    explicit TaskReporter(const QMap<int, TaskStatus> &map = QMap<int, TaskStatus>(), QObject *parent = nullptr);
+    explicit Reporter(const QMap<int, TaskStatus> &map = QMap<int, TaskStatus>(), QObject *parent = nullptr);
 
 Q_SIGNALS:
     void uploadSuccess(int taskId);
@@ -30,4 +30,4 @@ private:
     QMap<int, TaskStatus> m_taskMap;
 };
 
-#endif // TASK_REPORTER_H
+#endif // REPORTER_H

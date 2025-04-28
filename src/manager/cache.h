@@ -1,5 +1,5 @@
-#ifndef TASK_CACHE_H
-#define TASK_CACHE_H
+#ifndef CACHE_H
+#define CACHE_H
 
 #include <QObject>
 #include <QMap>
@@ -9,17 +9,17 @@
 #include "task.h"
 
 /**
- * @brief The TaskCache class
+ * @brief The Cache class
  * Used to save the status of service tasks, with data stored locally. 
  * Even if the process is abnormally closed, the next startup can retrieve the execution status of tasks from local storage,
  * allowing the system to decide whether to continue execution or report completion status.
  * This prevents task loss caused by abnormal process termination.
  */
-class TaskCache : public QObject
+class Cache : public QObject
 {
     Q_OBJECT
 public:
-    explicit TaskCache(QObject *parent = nullptr);
+    explicit Cache(QObject *parent = nullptr);
 
     QMap<Task, TaskStatus> loadFromCache() const;
 
@@ -50,4 +50,4 @@ private:
 #endif
 };
 
-#endif // TASK_CACHE_H
+#endif // CACHE_H

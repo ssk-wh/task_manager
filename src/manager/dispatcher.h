@@ -1,5 +1,5 @@
-#ifndef TASK_DISPATCH_H
-#define TASK_DISPATCH_H
+#ifndef DISPATCH_H
+#define DISPATCH_H
 
 #include <QObject>
 #include <QMap>
@@ -8,16 +8,16 @@
 
 class AbstractTaskHandler;
 /**
- * @brief The TaskDispatcher class
+ * @brief The Dispatcher class
  * Responsible only for dispatching tasks and forwarding task execution status.
  */
-class TaskDispatcher : public QObject
+class Dispatcher : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int handlerCount READ handlerCount NOTIFY handlerCountChanged)
 
 public:
-    explicit TaskDispatcher(QObject *parent = nullptr);
+    explicit Dispatcher(QObject *parent = nullptr);
 
     void dispatch(const Task &info);
 
@@ -35,4 +35,4 @@ private:
     QMap<AbstractTaskHandler *, int> m_dispatchTaskMap;
 };
 
-#endif // TASK_DISPATCH_H
+#endif // DISPATCH_H

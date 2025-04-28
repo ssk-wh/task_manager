@@ -27,36 +27,17 @@ endif()
 
 # generate dbus adapter file
 execute_process(
-    COMMAND qdbusxml2cpp io.github.ssk.TaskManager.xml -a manager_adapter
+    COMMAND qdbusxml2cpp io.github.ssk.TaskManager.xml -a taskmanager_adapter
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-set(SOURCES
-    cache.cpp
-    main.cpp
-    dispatcher.cpp
-    manager.cpp
-    manager_adapter.cpp
-    reporter.cpp
-    handler/task.cpp
-    handler/bash_task_handler.cpp
-    handler/settings_task_handler.cpp
-    handler/strategy_task_handler.cpp
-    handler/ping_task_handler.cpp
+file(GLOB SOURCES
+    *.cpp
+    handler/*.cpp
 )
-
-set(HEADERS
-    cache.h
-    dispatcher.h
-    manager.h
-    manager_adapter.h
-    reporter.h
-    handler/task.h
-    handler/abstract_task_handler.h
-    handler/bash_task_handler.h
-    handler/settings_task_handler.h
-    handler/strategy_task_handler.h
-    handler/ping_task_handler.h
+file(GLOB HEADERS
+    *.h
+    handler/*.h
 )
 
 include_directories(
@@ -65,7 +46,6 @@ include_directories(
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GSETTINGS_QT REQUIRED gsettings-qt)
-
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 

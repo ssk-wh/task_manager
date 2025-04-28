@@ -1,5 +1,5 @@
 #include "manager.h"
-#include "manager_adapter.h"
+#include "taskmanager_adapter.h"
 
 #include <QCoreApplication>
 #include <QDateTime>
@@ -49,17 +49,17 @@ int main(int argc, char *argv[])
 
 #ifdef ENABLE_DBUS_REGISTER
     QDBusConnection connection = QDBusConnection::sessionBus();
-    if(!connection.registerService("io.github.ssk.TaskManager")) {
+    if(!connection.registerService("io.github.ssk.Manager")) {
         qCWarning(main_logging) << "Service is running, quit...";
         return 1;
     }
 #endif
 
-    TaskManager w;
+    Manager w;
 
 #ifdef ENABLE_DBUS_REGISTER
     new TaskManagerAdaptor(&w);
-    if (!connection.registerObject("/TaskManager", &w)) {
+    if (!connection.registerObject("/Manager", &w)) {
         qDebug() << connection.lastError().message();
         qCWarning(main_logging) << "Service register failed, quit...";
         return 1;

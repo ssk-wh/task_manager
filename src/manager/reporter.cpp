@@ -10,14 +10,14 @@
 
 Q_LOGGING_CATEGORY(taskReporter, "taskreporter")
 
-TaskReporter::TaskReporter(const QMap<int, TaskStatus> &taskMap, QObject *parent)
+Reporter::Reporter(const QMap<int, TaskStatus> &taskMap, QObject *parent)
     : QObject(parent)
     , m_taskMap(taskMap)
 {
 
 }
 
-void TaskReporter::run()
+void Reporter::run()
 {
     QMapIterator<int, TaskStatus> it(m_taskMap);
     while (it.hasNext()) {

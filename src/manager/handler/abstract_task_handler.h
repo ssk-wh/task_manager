@@ -6,9 +6,9 @@
 #include <QObject>
 #include <QRunnable>
 
-#define CREATE_PTR(Handler)  __##Handler##create
+#define GET_HANDLER_PTR(Handler)  __##Handler##__create
 #define DECLARE_CREATE(Handler)                    \
-static Handler *__##Handler##create(const Task &info, QObject *parent) { \
+static Handler *__##Handler##__create(const Task &info, QObject *parent) { \
     return new Handler(info, parent);                       \
 }
 class AbstractTaskHandler : public QObject, public QRunnable

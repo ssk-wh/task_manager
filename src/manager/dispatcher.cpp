@@ -13,10 +13,10 @@ Q_LOGGING_CATEGORY(taskdispatcher, "dispatcher")
 Dispatcher::Dispatcher(QObject *parent)
     : QObject(parent)
 {
-    m_handlerMap.insert(TaskType::Ping,       reinterpret_cast<AbstractTaskHandler* (*)(const Task&, QObject*)>(&CREATE_PTR(PingTaskHandler)));
-    m_handlerMap.insert(TaskType::Bash,       reinterpret_cast<AbstractTaskHandler* (*)(const Task&, QObject*)>(&CREATE_PTR(BashTaskHandler)));
-    m_handlerMap.insert(TaskType::Settings,   reinterpret_cast<AbstractTaskHandler* (*)(const Task&, QObject*)>(&CREATE_PTR(SettingsTaskHandler)));
-    m_handlerMap.insert(TaskType::Strategy,   reinterpret_cast<AbstractTaskHandler* (*)(const Task&, QObject*)>(&CREATE_PTR(StrategyTaskHandler)));
+    m_handlerMap.insert(TaskType::Ping,       reinterpret_cast<AbstractTaskHandler* (*)(const Task&, QObject*)>(&GET_HANDLER_PTR(PingTaskHandler)));
+    m_handlerMap.insert(TaskType::Bash,       reinterpret_cast<AbstractTaskHandler* (*)(const Task&, QObject*)>(&GET_HANDLER_PTR(BashTaskHandler)));
+    m_handlerMap.insert(TaskType::Settings,   reinterpret_cast<AbstractTaskHandler* (*)(const Task&, QObject*)>(&GET_HANDLER_PTR(SettingsTaskHandler)));
+    m_handlerMap.insert(TaskType::Strategy,   reinterpret_cast<AbstractTaskHandler* (*)(const Task&, QObject*)>(&GET_HANDLER_PTR(StrategyTaskHandler)));
 }
 
 void Dispatcher::dispatch(const Task &info)

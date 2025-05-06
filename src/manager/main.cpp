@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
 #ifdef ENABLE_DBUS_REGISTER
     QDBusConnection connection = QDBusConnection::sessionBus();
-    if(!connection.registerService("io.github.ssk.Manager")) {
+    if(!connection.registerService("io.github.ssk.TaskManager")) {
         qCWarning(main_logging) << "Service is running, quit...";
         return 1;
     }
@@ -59,11 +59,12 @@ int main(int argc, char *argv[])
 
 #ifdef ENABLE_DBUS_REGISTER
     new TaskManagerAdaptor(&w);
-    if (!connection.registerObject("/Manager", &w)) {
+    if (!connection.registerObject("/TaskManager", &w)) {
         qDebug() << connection.lastError().message();
         qCWarning(main_logging) << "Service register failed, quit...";
         return 1;
     }
+    qDebug() << "DBus register success";
 #endif
 
     return a.exec();

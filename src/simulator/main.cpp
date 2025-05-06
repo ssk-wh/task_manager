@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QDBusInterface inter("io.github.ssk.Manager", "/Manager", "io.github.ssk.Manager", QDBusConnection::sessionBus());
+    QDBusInterface inter("io.github.ssk.TaskManager", "/TaskManager", "io.github.ssk.TaskManager", QDBusConnection::sessionBus());
     int type = -1;
     int id = 0;
     QString name, command;
